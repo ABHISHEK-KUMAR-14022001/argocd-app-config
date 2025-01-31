@@ -1,19 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: myapp
+  name: todo-deployment
+  labels:
+    app: todo-app
 spec:
+  replicas: 3
   selector:
     matchLabels:
-      app: myapp
-  replicas: 2
+      app: todo-app
   template:
     metadata:
       labels:
-        app: myapp
+        app: todo-app
     spec:
       containers:
-      - name: myapp
-        image: nanajanashia/argocd-app:1.2
+      - name: todo-app
+        image: abhishekkumar1402/node-app:latest
         ports:
-        - containerPort: 8080
+        - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-service
+spec:
+  selector:
+    app: todo-app
+  ports:
+    - port: 80
+      targetPort: 8000
+  type: LoadBalancer
