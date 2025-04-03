@@ -1,0 +1,164 @@
+ArgoCD Setup:
+
+kubectl create namespace argocd
+
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+
+kubectl port-forward svc/argocd-server -n argocd 8084:443 --address=0.0.0.0 &
+
+kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 --decode
+
+kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d; echo
+
+k7vM8uuCzM8W2qT8
+
+kubectl get svc argocd-server -n argocd
+
+Step 2: Login to Argo CD CLI
+
+curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+chmod +x argocd
+sudo mv argocd /usr/local/bin/
+
+argocd version
+
+argocd login 34.55.232.135 --username admin --password GqV2fDd3H2HkIRXF --insecure
+argocd login 172.20.3.42:8084 --username admin --password k7vM8uuCzM8W2qT8 --insecure
+
+
+Authenticate with GCP
+
+step-1:
+
+gcloud auth login
+gcloud auth list
+If your desired account is listed but not active, set it as active:
+gcloud config set account YOUR_ACCOUNT_EMAIL
+Once authenticated, set your project:
+gcloud config set project idp-project-deploy-455506
+gcloud container clusters get-credentials first-cluster --zone us-central1-a --project idp-project-deploy-455506
+kubectl config get-contexts
+kubectl config current-context
+
+
+step-2:
+
+Authenticate Using the Service Account JSON File
+gcloud auth activate-service-account --key-file ~/gcp-key.json
+gcloud config set project idp-project-deploy-455506
+gcloud container clusters get-credentials first-cluster --zone us-central1-a --project idp-project-deploy-455506
+kubectl config get-contexts
+kubectl config current-context
+
+
+Step 3: Add the Second Cluster to Argo CD
+
+argocd cluster add gke_idp-project-deploy-455506_us-central1-a_first-cluster
+
+argocd cluster list
+
+kubectl config use-context minikube
+kubectl config use-context gke_idp-project-deploy-455506_us-central1-a_first-cluster
+
+
+
+Apply it using kubectl:
+
+nano application.yaml
+kubectl apply -f application.yaml -n argocd
+
+application.argoproj.io/test-argo-application created
+application.argoproj.io/deploy-argo-application created
+
+
+
+Verify if the applications are created:
+
+argocd app list
+
+Check deployment status:
+
+argocd app get test-argo-application
+argocd app get deploy-argo-application
+
+
+kubectl delete applications.argoproj.io test-argo-application -n argocd --ignore-not-found=true
+kubectl delete applications.argoproj.io deploy-argo-application -n argocd --ignore-not-found=true
+
+
+
+
+
+
+
+
+
+## Checks & Fixes:
+
+### Ensure Projects Exist in ArgoCD
+
+argocd proj list
+```
+
+argocd proj create test --description "Test Project"
+argocd proj create prod --description "Deploy Project"
+```
+
+### Ensure the Source Repositories Are Allowed
+
+
+argocd proj add-source test https://github.com/ABHISHEK-KUMAR-14022001/argocd-app-config.git
+argocd proj add-source prod https://github.com/ABHISHEK-KUMAR-14022001/argocd-app-config.git
+```
+
+### Ensure Destinations Are Correct
+
+
+argocd cluster list
+
+argocd proj add-destination test https://kubernetes.default.svc myapp
+argocd proj add-destination prod https://34.173.0.248 deployapp
+```
+
+### Apply & Sync Your Application YAML
+
+
+kubectl apply -f application.yaml -n argocd
+
+Sync applications:
+
+argocd app sync test-argo-application
+argocd app sync deploy-argo-application
+
+
+## 🔥 Final Review of `application.yaml`
+
+Your `application.yaml` file looks correct with the following:
+
+✅ Two applications (`test-argo-application` and `deploy-argo-application`)
+✅ Properly defined **projects** (`test` and `deploy`)
+✅ Correct **destination servers**:
+  - `https://kubernetes.default.svc` for the default cluster
+  - `https://35.224.230.101` for the new cluster
+✅ `syncPolicy` with **`CreateNamespace=true`**, `selfHeal`, and `prune` (good settings)
+
+## 🚀 Next Steps
+
+If everything is set up correctly, you should see both applications **syncing successfully** in the ArgoCD UI or via CLI:
+```bash
+argocd app list
+```
+If there are errors, check logs:
+```bash
+argocd app get deploy-argo-application
+
+
+
+argocd proj delete deploy
+
+```
+
+
+

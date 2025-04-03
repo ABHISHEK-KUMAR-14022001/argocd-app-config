@@ -1,0 +1,34 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: ensure-mysql-running
+spec:
+  validationFailureAction: Enforce
+  background: false
+  rules:
+    - name: check-mysql-status
+      match:
+        resources:
+          kinds:
+            - Deployment
+          namespaces:
+            - default
+      exclude:
+        resources:
+          kinds:
+            - Deployment
+          names:
+            - mysql
+      context:
+        - name: mysqlStatus
+          apiCall:
+            method: GET
+            urlPath: "/api/v1/namespaces/default/pods?labelSelector=app=mysql"
+            jmesPath: "items[?status.phase=='Running'] | length(@)" # Count running pods
+      validate:
+        message: "MySQL pod must be running before deploying node-app."
+        deny:
+          conditions:
+            - key: "{{ mysqlStatus }}"
+              operator: LessThan
+              value: 1  # Ensures at least one MySQL pod is running

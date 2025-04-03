@@ -1,0 +1,43 @@
+# ✅ This will pass: "team" label is present with "dev"
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment-dev
+  labels:
+    app: nginx
+    team: dev 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.23.0
+
+---
+# # ❌ This will FAIL because "team" label is missing
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: nginx-deployment-missing-label
+#   labels:
+#     app: nginx
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: nginx
+#   template:
+#     metadata:
+#       labels:
+#         app: nginx
+#     spec:
+#       containers:
+#         - name: nginx
+#           image: nginx:1.23.0

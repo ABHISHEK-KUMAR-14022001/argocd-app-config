@@ -1,0 +1,27 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: enforce-readiness-liveness
+spec:
+  validationFailureAction: Enforce  # Use 'Audit' for testing
+  rules:
+    - name: check-probes
+      match:
+        resources:
+          kinds:
+            - Deployment
+      validate:
+        message: "Containers must have both readinessProbe and livenessProbe."
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - livenessProbe: 
+                      httpGet:
+                        path: "*"
+                        port: "*"
+                  - readinessProbe: 
+                      httpGet:
+                        path: "*"
+                        port: "*"
