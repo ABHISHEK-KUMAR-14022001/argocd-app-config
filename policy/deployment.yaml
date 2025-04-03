@@ -1,36 +1,20 @@
-# 2️⃣ Deployment with Required `team` Label
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
 metadata:
-  name: todo-deployment
-  labels:
-    app: todo-app
+  name: require-deployment-team-label
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: todo-app
-  template:
-    metadata:
-      labels:
-        app: todo-app
-    spec:
-      containers:
-      - name: todo-app
-        image: abhishekkumar1402/node-app:latest
-        ports:
-        - containerPort: 8000
-
----
-# 3️⃣ Service to Expose the Deployment
-apiVersion: v1
-kind: Service
-metadata:
-  name: todo-service
-spec:
-  selector:
-    app: todo-app
-  ports:
-    - port: 80
-      targetPort: 8000
-  type: LoadBalancer
+  validationFailureAction: Enforce
+  rules:
+    # 1️⃣ Label must be present with any value
+    - name: require-any-label
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+      validate:
+        message: "You must have a `team` label for all deployments"
+        pattern:
+          metadata:
+            labels:
+              team: "?*"
