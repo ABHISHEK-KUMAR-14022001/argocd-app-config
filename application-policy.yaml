@@ -5,14 +5,14 @@ metadata:
   name: deploy-argo-application
   namespace: argocd
 spec:
-  project: prod
+  project: default
   source:
     repoURL: https://github.com/ABHISHEK-KUMAR-14022001/argocd-app-config.git
-    targetRevision: HEAD
+    targetRevision: main
     path: policy
   destination:
-    server: https://35.224.230.101   # External API of new cluster
-    namespace: deployapp
+    server: https://34.173.0.248   # External API of new cluster
+    namespace: kyverno
   syncPolicy:
     syncOptions:
       - CreateNamespace=true

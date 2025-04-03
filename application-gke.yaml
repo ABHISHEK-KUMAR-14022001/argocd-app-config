@@ -8,10 +8,10 @@ spec:
   project: prod
   source:
     repoURL: https://github.com/ABHISHEK-KUMAR-14022001/argocd-app-config.git
-    targetRevision: HEAD
+    targetRevision: main
     path: prod
   destination:
-    server: https://35.224.230.101   # External API of new cluster
+    server: https://34.173.0.248   # External API of new cluster
     namespace: deployapp
   syncPolicy:
     syncOptions:
