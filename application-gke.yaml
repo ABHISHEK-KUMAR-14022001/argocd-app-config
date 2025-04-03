@@ -12,7 +12,7 @@ spec:
     path: prod
   destination:
     server: https://34.173.0.248   # External API of new cluster
-    namespace: deployapp
+    namespace: kyverno
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
