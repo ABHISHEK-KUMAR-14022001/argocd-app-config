@@ -4,7 +4,7 @@ metadata:
   name: todo-deployment
   labels:
     app: todo-app
-    team: dev
+    team: devops
 spec:
   replicas: 1
   selector:
