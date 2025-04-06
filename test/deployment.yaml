@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: todo-app
-        image: abhishekkumar1402/node-app:latest
+        image: abhishekkumar1402/node-app:latest1
         ports:
         - containerPort: 8000
 ---
