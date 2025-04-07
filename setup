@@ -162,3 +162,27 @@ argocd proj delete deploy
 
 
 
+###############
+
+kubectl edit configmap argocd-cm -n argocd
+
+
+apiVersion: v1
+data:
+  repos.git.polling.interval: 30s
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"ConfigMap","metadata":{"annotations":{},"labels":{"app.kubernetes.io/name":"argocd-cm","app.kubernetes.io/part-of":"argocd"},"name":"argocd-cm","namespace":"argocd"}}
+  creationTimestamp: "2025-03-26T06:27:55Z"
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
+  name: argocd-cm
+  namespace: argocd
+  resourceVersion: "3113134"
+  uid: d374f3ce-77eb-4a09-8d5d-db68a958ad9f
+
+
+kubectl rollout restart deployment argocd-repo-server -n argocd

@@ -1,0 +1,110 @@
+# Application for default cluster (minikube)
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: test-argo-application
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ABHISHEK-KUMAR-14022001/argocd-app-config.git
+    targetRevision: HEAD
+    path: test
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: myapp
+  syncPolicy:
+    syncOptions:
+      - Validate=true
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    automated:
+      selfHeal: true
+      prune: true
+      allowEmpty: false
+    retry:
+      limit: 3  # Retry up to 3 times
+      backoff:
+        duration: 5m  # Wait 5 minutes before retrying
+        factor: 2
+        maxDuration: 30m
+
+---
+# kyverno-policies.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kyverno-policies
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ABHISHEK-KUMAR-14022001/argocd-app-config.git
+    targetRevision: main
+    path: policy
+  destination:
+    server: https://35.192.181.46
+    namespace: kyverno
+  syncPolicy:
+    syncOptions:
+      - Validate=true
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    automated:
+      selfHeal: true
+      prune: true
+      allowEmpty: false
+    retry:
+      limit: 3  # Retry up to 3 times
+      backoff:
+        duration: 5m  # Wait 5 minutes before retrying
+        factor: 2
+        maxDuration: 30m
+
+
+---
+
+# deployment-app.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prod-app
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ABHISHEK-KUMAR-14022001/argocd-app-config.git
+    targetRevision: main
+    path: prod
+  destination:
+    server: https://35.192.181.46
+    namespace: deployapp
+  syncPolicy:
+    syncOptions:
+      - Validate=true
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    automated:
+      selfHeal: true
+      prune: true
+      allowEmpty: false
+    retry:
+      limit: 3  # Retry up to 3 times
+      backoff:
+        duration: 5m  # Wait 5 minutes before retrying
+        factor: 2
+        maxDuration: 30m
+
