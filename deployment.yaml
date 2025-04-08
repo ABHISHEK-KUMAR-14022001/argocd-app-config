@@ -50,7 +50,7 @@ spec:
     targetRevision: main
     path: policy
   destination:
-    server: https://35.192.181.46
+    server: https://34.44.243.26
     namespace: kyverno
   syncPolicy:
     syncOptions:
@@ -89,7 +89,7 @@ spec:
     targetRevision: main
     path: prod
   destination:
-    server: https://35.192.181.46
+    server: https://34.44.243.26
     namespace: deployapp
   syncPolicy:
     syncOptions:
