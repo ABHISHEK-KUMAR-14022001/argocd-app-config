@@ -19,6 +19,47 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 
 #### Links
 
+
+
+1️⃣ Create "test-argo-application":
+Go to Argo CD UI → NEW APP
+
+Fill in the fields based on:
+
+Name: test-argo-application
+
+Repo URL: https://github.com/ABHISHEK-KUMAR-14022001/argocd-app-config.git
+
+Path: test
+
+Cluster: https://kubernetes.default.svc
+
+Namespace: myapp
+
+Click "Create"
+
+2️⃣ Create "kyverno-policies":
+Repeat the above process, changing:
+
+Name: kyverno-policies
+
+Path: policy
+
+Cluster: https://130.211.194.118
+
+Namespace: kyverno
+
+3️⃣ Create "prod-app":
+Repeat again with:
+
+Name: prod-app
+
+Path: prod
+
+Cluster: https://130.211.194.118
+
+Namespace: deployapp
+
 * Config repo: [https://gitlab.com/nanuchi/argocd-app-config](https://gitlab.com/nanuchi/argocd-app-config)
 
 * Docker repo: [https://hub.docker.com/repository/docker/nanajanashia/argocd-app](https://hub.docker.com/repository/docker/nanajanashia/argocd-app)
